@@ -1,0 +1,43 @@
+services:
+  ldap:
+    image: osixia/openldap:1.5.0
+    environment:
+      LDAP_ORGANISATION: "Example Inc."
+      LDAP_DOMAIN: "example.org"
+      LDAP_ADMIN_USERNAME: admin
+      LDAP_ADMIN_PASSWORD: adminpassword
+      LDAP_ANONYMOUS: false
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
+      APACHE_SERVER_NAME: ldapadmin.localhost
+    volumes:
+      - ./persistent_data/ldap_data:/var/lib/ldap
+      - ./persistent_data/ldap_config:/etc/ldap/slapd.d
+      - ./ldapAdminUi/config/apache-disable-stapling.conf:/etc/apache2/conf-enabled/ssl-stapling-off.conf
+
+  ldap-ui:
+    image: osixia/phpldapadmin:0.9.0
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: ldap
+    depends_on:
+      - ldap
+
+  auth:
+    build: ./authSideCar
+    depends_on:
+      - ldap
+
+  protected-app:
+    build: ./protected_service
+    depends_on:
+      - ldap
+
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - auth

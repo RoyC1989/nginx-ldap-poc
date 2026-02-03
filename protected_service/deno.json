@@ -1,0 +1,7 @@
+{
+    "tasks": {
+        "server": "deno run --cached-only --allow-net --allow-read server.ts",
+        "tests": "deno test --cached-only --allow-net --allow-read",
+        "coverage": "deno test --cached-only --allow-net --allow-read --coverage=lcov"
+    }
+}

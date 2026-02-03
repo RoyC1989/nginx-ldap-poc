@@ -1,0 +1,9 @@
+FROM denoland/deno:alpine
+
+WORKDIR /app
+
+COPY server.ts .
+
+RUN deno cache server.ts
+
+CMD ["deno", "run", "--allow-net", "--allow-env", "server.ts"]

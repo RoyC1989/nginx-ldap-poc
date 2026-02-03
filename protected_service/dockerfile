@@ -1,0 +1,11 @@
+FROM denoland/deno:alpine
+
+WORKDIR /app
+
+COPY server.ts .
+
+ADD hostedFiles ./hostedFiles
+
+RUN deno cache server.ts
+
+CMD ["deno", "run", "--allow-net", "--allow-read", "server.ts"]
